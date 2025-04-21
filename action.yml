@@ -105,7 +105,7 @@ runs:
           # Search workspaces using GET method
           response=$(curl -s -X GET \
             "${{ inputs.api_url }}/api/Workspace/search?${paged_query}" \
-            -H "Authorization: Bearer ${{ inputs.api_key }}")
+            -H "Authorization: APIKEY ${{ inputs.api_key }}")
 
           # Extract workspaces from the response and create a simplified JSON with only id and name
           page_workspaces=$(echo "$response" | jq -r '.workspaces | map({id: .id, name: .name})')

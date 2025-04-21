@@ -86,9 +86,6 @@ jobs:
       matrix: ${{ steps.create-matrix.outputs.matrix }}
       workspace_count: ${{ steps.search.outputs.workspaces_count }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Search Workspaces
         id: search
         uses: TonicAI/structural-workspace-search@v1
@@ -114,9 +111,6 @@ jobs:
       fail-fast: false # Continue with other workspaces if one fails
     name: Process ${{ matrix.workspace.name }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Start Generation Job
         id: start-job
         uses: TonicAI/structural-start-job@v1
