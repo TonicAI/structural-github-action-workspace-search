@@ -1,4 +1,4 @@
-name: 'Workspace Search'
+name: 'Structural Workspace Search'
 description: 'Searches for workspaces using the Tonic API and returns workspace IDs and names'
 branding:
   icon: "search"
