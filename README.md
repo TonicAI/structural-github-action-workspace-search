@@ -27,13 +27,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Search Workspaces
         id: search
         uses: TonicAI/structural-workspace-search@v1
         with:
           api_key: ${{ secrets.TONIC_API_KEY }}
-      
+
       - name: Print Workspace Count
         run: echo "Found ${{ steps.search.outputs.workspaces_count }} workspaces"
 ```
@@ -47,7 +47,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Search Workspaces
         id: search
         uses: TonicAI/structural-workspace-search@v1
@@ -57,18 +57,18 @@ jobs:
           database_types: "Postgres,MySQL"
           tags: "prod,critical"
           owner_id: "00000000-0000-0000-0000-000000000000"
-      
+
       - name: Process Search Results
         run: |
           # Parse the JSON string to a variable
           WORKSPACES='${{ steps.search.outputs.workspaces_json }}'
-          
+
           # Process the workspaces using jq
           echo "$WORKSPACES" | jq -c '.[]' | while read -r workspace; do
             id=$(echo "$workspace" | jq -r '.id')
             name=$(echo "$workspace" | jq -r '.name')
             echo "Processing workspace: $name ($id)"
-            
+
             # Do something with each workspace...
           done
 ```
@@ -88,14 +88,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Search Workspaces
         id: search
         uses: TonicAI/structural-workspace-search@v1
         with:
           api_key: ${{ secrets.TONIC_API_KEY }}
           tags: "prod" # Only search for production workspaces
-      
+
       - name: Create Matrix
         id: create-matrix
         run: |
@@ -116,7 +116,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Start Generation Job
         id: start-job
         uses: TonicAI/structural-start-job@v1
@@ -124,7 +124,7 @@ jobs:
           workspace_id: ${{ matrix.workspace.id }}
           api_key: ${{ secrets.TONIC_API_KEY }}
           strict_mode: "RejectOnSchemaActions"
-      
+
       - name: Print Job Details
         run: |
           echo "Started generation job for workspace: ${{ matrix.workspace.name }}"
