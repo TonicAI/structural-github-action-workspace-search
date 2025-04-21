@@ -30,7 +30,7 @@ jobs:
       
       - name: Search Workspaces
         id: search
-        uses: TonicAI/structural-github-actions/workspace-search@v1
+        uses: TonicAI/structural-workspace-search@v1
         with:
           api_key: ${{ secrets.TONIC_API_KEY }}
       
@@ -50,7 +50,7 @@ jobs:
       
       - name: Search Workspaces
         id: search
-        uses: TonicAI/structural-github-actions/workspace-search@v1
+        uses: TonicAI/structural-workspace-search@v1
         with:
           api_key: ${{ secrets.TONIC_API_KEY }}
           search_term: "production"
@@ -91,7 +91,7 @@ jobs:
       
       - name: Search Workspaces
         id: search
-        uses: TonicAI/structural-github-actions/workspace-search@v1
+        uses: TonicAI/structural-workspace-search@v1
         with:
           api_key: ${{ secrets.TONIC_API_KEY }}
           tags: "prod" # Only search for production workspaces
@@ -119,7 +119,7 @@ jobs:
       
       - name: Start Generation Job
         id: start-job
-        uses: TonicAI/structural-github-actions/start-job@v1
+        uses: TonicAI/structural-start-job@v1
         with:
           workspace_id: ${{ matrix.workspace.id }}
           api_key: ${{ secrets.TONIC_API_KEY }}
