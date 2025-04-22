@@ -13,7 +13,7 @@ This action searches for workspaces using the Tonic API and returns workspace ID
 
 ## Outputs
 
-- `workspaces_json`: JSON string containing workspace IDs and names in GitHub Actions matrix-ready format: `{"workspace": [{"id":"...","name":"..."},...]}`
+- `workspaces_json`: JSON string containing workspace IDs and names in GitHub Actions matrix-ready format: `{"workspaces": [{"id":"...","name":"..."},...]}`
 - `workspaces_count`: Number of workspaces found
 
 ## Example Usage
@@ -108,19 +108,19 @@ jobs:
     strategy:
       matrix: ${{ fromJson(needs.search-workspaces.outputs.matrix) }}
       fail-fast: false # Continue with other workspaces if one fails
-    name: Process ${{ matrix.workspace.name }}
+    name: Process ${{ matrix.workspaces.name }}
     steps:
       - name: Start Generation Job
         id: start-job
         uses: TonicAI/structural-start-job@v1
         with:
-          workspace_id: ${{ matrix.workspace.id }}
+          workspace_id: ${{ matrix.workspaces.id }}
           api_key: ${{ secrets.TONIC_API_KEY }}
           strict_mode: "RejectOnSchemaActions"
 
       - name: Print Job Details
         run: |
-          echo "Started generation job for workspace: ${{ matrix.workspace.name }}"
+          echo "Started generation job for workspace: ${{ matrix.workspaces.name }}"
           echo "Job ID: ${{ steps.start-job.outputs.job_id }}"
 ```
 
