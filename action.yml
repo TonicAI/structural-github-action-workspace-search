@@ -119,7 +119,7 @@ runs:
         while [ $current_page -le $total_pages ]; do
           # Calculate offset for current page
           offset=$(( (current_page - 1) * page_size ))
-          
+
           # Add pagination parameters to query string
           paged_query="${query_string}&limit=${page_size}&offset=${offset}"
 
@@ -150,7 +150,7 @@ runs:
 
           # Get the count of workspaces in this page
           page_count=$(echo "$page_workspaces" | jq -r 'length')
-          
+
           # Check if we got an empty page (no more results)
           if [ "$page_count" -eq 0 ]; then
             echo "No workspaces found on page $current_page"
@@ -169,7 +169,7 @@ runs:
           # Update count and move to next page
           total_count=$((total_count + page_count))
           current_page=$((current_page + 1))
-          
+
           echo "Processed page $((current_page - 1)) with $page_count workspace(s)"
         done
 
@@ -180,8 +180,8 @@ runs:
           workspaces_count=$total_count
         fi
 
-        # Format JSON for GitHub Actions output
-        workspaces_json=$(echo "$all_workspaces" | jq -c .)
+        # Format JSON for GitHub Actions output in matrix-ready format
+        workspaces_json=$(echo "$all_workspaces" | jq -c '{"workspaces": .}')
 
         # Set the output variables
         echo "workspaces_json<<EOF" >> $GITHUB_OUTPUT

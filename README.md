@@ -13,7 +13,7 @@ This action searches for workspaces using the Tonic API and returns workspace ID
 
 ## Outputs
 
-- `workspaces_json`: JSON string containing workspace IDs and names
+- `workspaces_json`: JSON string containing workspace IDs and names in GitHub Actions matrix-ready format: `{"workspace": [{"id":"...","name":"..."},...]}`
 - `workspaces_count`: Number of workspaces found
 
 ## Example Usage
@@ -93,12 +93,11 @@ jobs:
           api_key: ${{ secrets.TONIC_API_KEY }}
           tags: "prod" # Only search for production workspaces
 
-      - name: Create Matrix
+      - name: Set Matrix Output
         id: create-matrix
         run: |
-          # Convert the search results to a matrix format
-          MATRIX=$(echo '${{ steps.search.outputs.workspaces_json }}' | jq '{workspace: .}')
-          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+          # Output is already in the correct matrix format
+          echo "matrix=${{ steps.search.outputs.workspaces_json }}" >> $GITHUB_OUTPUT
           echo "Found ${{ steps.search.outputs.workspaces_count }} workspaces for matrix"
 
   # Second job that uses the matrix to run tasks in parallel
