@@ -64,7 +64,7 @@ jobs:
           WORKSPACES='${{ steps.search.outputs.workspaces_json }}'
 
           # Process the workspaces using jq
-          echo "$WORKSPACES" | jq -c '.[]' | while read -r workspace; do
+          echo "$WORKSPACES" | jq -c '.workspaces[]' | while read -r workspace; do
             id=$(echo "$workspace" | jq -r '.id')
             name=$(echo "$workspace" | jq -r '.name')
             echo "Processing workspace: $name ($id)"
@@ -96,8 +96,9 @@ jobs:
       - name: Set Matrix Output
         id: create-matrix
         run: |
-          # Output is already in the correct matrix format
-          echo "matrix=${{ steps.search.outputs.workspaces_json }}" >> $GITHUB_OUTPUT
+          echo "matrix<<EOF" >> $GITHUB_OUTPUT
+          echo '${{ steps.search.outputs.workspaces_json }}' >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
           echo "Found ${{ steps.search.outputs.workspaces_count }} workspaces for matrix"
 
   # Second job that uses the matrix to run tasks in parallel

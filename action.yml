@@ -116,7 +116,7 @@ runs:
           fi
 
           # Extract workspaces from the response and create a simplified JSON with id and name
-          page_workspaces=$(echo "$response" | jq -r '.records | map({id: .id | tostring, name: .workspaceName})')
+          page_workspaces=$(echo "$response" | jq -r '.records | map({id: .id , name: .workspaceName})')
 
           # Check if we got a valid response
           if [ -z "$page_workspaces" ] || [ "$page_workspaces" = "null" ]; then
