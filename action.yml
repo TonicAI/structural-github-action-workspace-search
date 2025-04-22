@@ -109,18 +109,22 @@ runs:
         fi
 
         # Initialize variables for pagination
-        offset=0
         page_size=100
         all_workspaces="[]"
+        current_page=1
+        total_pages=1
         total_count=0
 
-        # Loop until we get an empty response
-        while true; do
+        # Loop through all pages
+        while [ $current_page -le $total_pages ]; do
+          # Calculate offset for current page
+          offset=$(( (current_page - 1) * page_size ))
+          
           # Add pagination parameters to query string
           paged_query="${query_string}&limit=${page_size}&offset=${offset}"
 
           # For debugging
-          echo "Fetching page with offset $offset, limit $page_size"
+          echo "Fetching page $current_page (offset $offset, limit $page_size)"
           echo "Query string: $paged_query"
 
           # Search workspaces using GET method
@@ -128,11 +132,15 @@ runs:
             "${{ inputs.api_url }}/api/Workspace/search?${paged_query}" \
             -H "Authorization: APIKEY ${{ inputs.api_key }}")
 
-          # Extract workspaces from the response and create a simplified JSON with only id and name
-          page_workspaces=$(echo "$response" | jq -r '.workspaces | map({id: .id, name: .name})')
+          # Extract total pages from the response
+          if [ $current_page -eq 1 ]; then
+            total_pages=$(echo "$response" | jq -r '.totalPages // 1')
+            total_records=$(echo "$response" | jq -r '.totalRecords // 0')
+            echo "Total pages: $total_pages, Total records: $total_records"
+          fi
 
-          # Get the count of workspaces in this page
-          page_count=$(echo "$page_workspaces" | jq -r 'length')
+          # Extract workspaces from the response and create a simplified JSON with id and name
+          page_workspaces=$(echo "$response" | jq -r '.records | map({id: .id, name: .workspaceName})')
 
           # Check if we got a valid response
           if [ -z "$page_workspaces" ] || [ "$page_workspaces" = "null" ]; then
@@ -140,14 +148,17 @@ runs:
             break
           fi
 
+          # Get the count of workspaces in this page
+          page_count=$(echo "$page_workspaces" | jq -r 'length')
+          
           # Check if we got an empty page (no more results)
           if [ "$page_count" -eq 0 ]; then
-            echo "No more workspaces to fetch"
+            echo "No workspaces found on page $current_page"
             break
           fi
 
           # Add this page's workspaces to our collection
-          if [ "$total_count" -eq 0 ]; then
+          if [ $current_page -eq 1 ]; then
             # First page, just use this page's workspaces
             all_workspaces=$page_workspaces
           else
@@ -155,19 +166,19 @@ runs:
             all_workspaces=$(echo "$all_workspaces" "$page_workspaces" | jq -s '.[0] + .[1]')
           fi
 
-          # Update count and offset for next page
+          # Update count and move to next page
           total_count=$((total_count + page_count))
-          offset=$((offset + page_size))
-
-          # If we got fewer results than the page size, we've reached the end
-          if [ "$page_count" -lt "$page_size" ]; then
-            echo "Reached end of results"
-            break
-          fi
+          current_page=$((current_page + 1))
+          
+          echo "Processed page $((current_page - 1)) with $page_count workspace(s)"
         done
 
-        # Get the final count of workspaces
-        workspaces_count=$total_count
+        # Use total_records from API if available, otherwise use our count
+        if [ -n "$total_records" ] && [ "$total_records" -gt 0 ]; then
+          workspaces_count=$total_records
+        else
+          workspaces_count=$total_count
+        fi
 
         # Escape JSON for output
         workspaces_json=$(echo "$all_workspaces" | jq -c . | sed 's/"/\\"/g')
