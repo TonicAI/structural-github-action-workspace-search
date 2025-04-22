@@ -180,11 +180,13 @@ runs:
           workspaces_count=$total_count
         fi
 
-        # Escape JSON for output
-        workspaces_json=$(echo "$all_workspaces" | jq -c . | sed 's/"/\\"/g')
+        # Format JSON for GitHub Actions output
+        workspaces_json=$(echo "$all_workspaces" | jq -c .)
 
         # Set the output variables
-        echo "workspaces_json=$workspaces_json" >> $GITHUB_OUTPUT
+        echo "workspaces_json<<EOF" >> $GITHUB_OUTPUT
+        echo "$workspaces_json" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
         echo "workspaces_count=$workspaces_count" >> $GITHUB_OUTPUT
 
         echo "Found $workspaces_count workspace(s) across all pages"
