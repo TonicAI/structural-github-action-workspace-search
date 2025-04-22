@@ -55,30 +55,9 @@ runs:
         # Build query string
         query_string="api-version=v2024.01.0"
 
-        # Function to URL encode a string
-        urlencode() {
-          # Replace special characters, including square brackets
-          local string="$1"
-          # Replace % first to avoid double-encoding
-          string="${string//%/%25}"
-          string="${string// /%20}"
-          string="${string//[/%5B}"
-          string="${string//]/%5D}"
-          string="${string//&/%26}"
-          string="${string//=/%3D}"
-          string="${string//,/%2C}"
-          string="${string//?/%3F}"
-          string="${string//:/%3A}"
-          string="${string//;/%3B}"
-          string="${string//+/%2B}"
-          string="${string//#/%23}"
-          echo "$string"
-        }
-
         # Add search term if provided
         if [ -n "${{ inputs.search_term }}" ]; then
-          encoded_search=$(urlencode "${{ inputs.search_term }}")
-          query_string="${query_string}&filters%5Bname%5D=${encoded_search}"
+          query_string="${query_string}&filters[name]=${{ inputs.search_term }}"
         fi
 
         # Add database types if provided
@@ -86,9 +65,7 @@ runs:
           # Split comma-separated list and add each value to query string
           IFS=',' read -ra DB_TYPES <<< "${{ inputs.database_types }}"
           for db_type in "${DB_TYPES[@]}"; do
-            # URL-encode the value
-            encoded_db_type=$(urlencode "$db_type")
-            query_string="${query_string}&filters%5Bdb_type%5D=${encoded_db_type}"
+            query_string="${query_string}&filters[db_type]=${db_type}"
           done
         fi
 
@@ -97,16 +74,13 @@ runs:
           # Split comma-separated list and add each value to query string
           IFS=',' read -ra TAGS <<< "${{ inputs.tags }}"
           for tag in "${TAGS[@]}"; do
-            # URL-encode the value
-            encoded_tag=$(urlencode "$tag")
-            query_string="${query_string}&filters%5Btag%5D=${encoded_tag}"
+            query_string="${query_string}&filters[tag]=${tag}"
           done
         fi
 
         # Add owner ID if provided
         if [ -n "${{ inputs.owner_id }}" ]; then
-          encoded_owner=$(urlencode "${{ inputs.owner_id }}")
-          query_string="${query_string}&filters%5Bowner%5D=${encoded_owner}"
+          query_string="${query_string}&filters[owner]=${{ inputs.owner_id }}"
         fi
 
         # Initialize variables for pagination
@@ -128,9 +102,10 @@ runs:
           echo "Fetching page $current_page (offset $offset, limit $page_size)"
           echo "Query string: $paged_query"
 
-          # Search workspaces using GET method
-          response=$(curl -s -X GET \
-            "${{ inputs.api_url }}/api/Workspace/search?${paged_query}" \
+          # Search workspaces using GET method with proper URL encoding
+          response=$(curl -s -G \
+            "${{ inputs.api_url }}/api/Workspace/search" \
+            --data-raw "${paged_query}" \
             -H "Authorization: APIKEY ${{ inputs.api_key }}")
 
           # Extract total pages from the response
