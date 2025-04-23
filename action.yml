@@ -1,14 +1,14 @@
 name: 'Structural Workspace Search'
-description: 'Searches for workspaces using the Tonic API and returns workspace IDs and names'
+description: 'Searches for workspaces using the Structural API and returns workspace IDs and names'
 branding:
   icon: "search"
   color: "blue"
 inputs:
   api_key:
-    description: 'Tonic API key'
+    description: 'Structural API key'
     required: true
   api_url:
-    description: 'Tonic API base URL'
+    description: 'Structural API base URL'
     required: false
     default: 'https://app.tonic.ai'
   search_term:

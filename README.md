@@ -1,11 +1,11 @@
 # Workspace Search
 
-This action searches for workspaces using the Tonic API and returns workspace IDs and names.
+This action searches for workspaces using the Structural API and returns workspace IDs and names.
 
 ## Inputs
 
-- `api_key` (required): Tonic API key for authentication
-- `api_url` (optional): Tonic API base URL, defaults to 'https://app.tonic.ai'
+- `api_key` (required): Structural API key for authentication
+- `api_url` (optional): Structural API base URL, defaults to 'https://app.tonic.ai'
 - `search_term` (optional): Term to search for in workspace names
 - `database_types` (optional): Comma-separated list of database types to filter by (e.g., "Postgres,MySql")
 - `tags` (optional): Comma-separated list of tags to filter by (e.g., "production,test")
@@ -32,7 +32,7 @@ jobs:
         id: search
         uses: TonicAI/structural-workspace-search@v1
         with:
-          api_key: ${{ secrets.TONIC_API_KEY }}
+          api_key: ${{ secrets.STRUCTURAL_API_KEY }}
 
       - name: Print Workspace Count
         run: echo "Found ${{ steps.search.outputs.workspaces_count }} workspaces"
@@ -52,7 +52,7 @@ jobs:
         id: search
         uses: TonicAI/structural-workspace-search@v1
         with:
-          api_key: ${{ secrets.TONIC_API_KEY }}
+          api_key: ${{ secrets.STRUCTURAL_API_KEY }}
           search_term: "production"
           database_types: "Postgres,MySQL"
           tags: "prod,critical"
@@ -90,7 +90,7 @@ jobs:
         id: search
         uses: TonicAI/structural-workspace-search@v1
         with:
-          api_key: ${{ secrets.TONIC_API_KEY }}
+          api_key: ${{ secrets.STRUCTURAL_API_KEY }}
           tags: "prod" # Only search for production workspaces
 
       - name: Set Matrix Output
@@ -116,7 +116,7 @@ jobs:
         uses: TonicAI/structural-start-job@v1
         with:
           workspace_id: ${{ matrix.workspaces.id }}
-          api_key: ${{ secrets.TONIC_API_KEY }}
+          api_key: ${{ secrets.STRUCTURAL_API_KEY }}
           strict_mode: "RejectOnSchemaActions"
 
       - name: Print Job Details
